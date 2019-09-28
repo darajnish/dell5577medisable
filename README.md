@@ -30,7 +30,7 @@ Currently, There are three ways to disable it:
 
 [Read more](https://github.com/corna/me_cleaner/wiki/HAP-AltMeDisable-bit)
 
-**This guide would tell you how I disabled ME through External Flashing with modified OEM firmware on my Dell Inspiron 15 5577 gaming laptop and other similar laptops. **
+**This guide would tell you how I disabled ME through External Flashing with modified OEM firmware on my Dell Inspiron 15 5577 gaming laptop and other similar laptops.**
 
 ## Steps to Disable ME on Dell Inspiron 15 5577 Gaming
 
@@ -63,7 +63,7 @@ So, The entire process can be divided into the following steps:
  - Reassemble the laptop
  - Recheck the status of Intel ME
  
-**It is highly recommended to go through the [Gentoo wiki](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Disabling_the_Intel_Management_Engine) as it is the more detailed procedure, which guided me along with every precautions and safety to successfully perform this process. **
+**It is recommended to go through the [Gentoo wiki](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Disabling_the_Intel_Management_Engine) as it is the more detailed procedure, which guided me along with every precautions and safety to successfully perform this process.**
 
 ### Things Required
 
@@ -328,7 +328,7 @@ See [output](/logs/me_cleaner-check.log).
 ```bash
 $ python me_cleaner/me_cleaner.py --soft-disable original.rom --output modified.rom
 ```
-    2. **soft-disable-only**(recommended): It only sets the AltMeDisable/HAP bit. **You must go for this if you've Intel Boot Guard enabled.**
+    1. **soft-disable-only** (recommended): It only sets the AltMeDisable/HAP bit. **You must go for this if you've Intel Boot Guard enabled.**
 ```bash
 $ python me_cleaner/me_cleaner.py --soft-disable-only original.rom --output modified.rom
 ```
