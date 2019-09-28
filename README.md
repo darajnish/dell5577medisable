@@ -225,7 +225,7 @@ Make sure to disconnect the batteries and CMOS cell from the while performing th
 **Mark the SOIC-8 flash chip test clip for the respective pin numbers of the IC to attach to, so that you don't get confused after wiring the clip with Raspberry Pi for which way to attach the clip.**
 - We'll have to use the SOIC-8 SOP-8 flash chip test clip to connect the bios flash IC to required Raspberry Pi SPI device pins respectively. Connect the pins of the clip to the Raspberry Pi pins using female to female jumper wires accordingly. Identify all the pins on the IC through its datasheet and look the gpio pin diagram for Raspberry Pi and connect the SOIC-8 clip pins as follows, so that it attaches to the correct pins on the IC after the clip is attached to the IC:
 
-![](imgs/pindiagram.png)
+![Pin Diagram](imgs/pindiagram.png)
 
 **WARNING :  Be very careful not to connect pins 2 or 4 on the RPi4's GPIO header to any pin of the IC clip - these are 5v (rather then 3.3v) and are likely to destroy your flash chip should you accidentally use them (See the datasheet to know about the appropriate input voltage).**
 
@@ -249,12 +249,13 @@ $ ping -c 4 archlinux.org
 ```
 - Now, We need to pull-up the gpio pins 16 and 18 on the Raspberry Pi. I've created the following script for this purpose. However, you can do this using `wiringpi` package's `gpio` tool for Pi 2 or 3. But, `wiringpi` fails for Pi 4 and its development seems to have stopped. Fortunately, the python library `RPi.GPIO` works on all three.
 ```bash
+$ wget https://raw.githubusercontent.com/darajnish/dell5577medisable/master/scripts/gpio.py
 $ python gpio.py 
 ```
 It should output the current value read from the pins 23 and 24 be set to **1**.
 
 ![Chip connected to Pi](imgs/chiptopi.jpg)
-![clip](imgs/flashchipwithclip.jpg)
+![Clip seated on the IC](imgs/flashchipwithclip.jpg)
 
 - Now, taking precautions to prevent [ESD](https://www.computerhope.com/esd.htm) and ensuring proper alignment of the clip with respect to the IC pins, carefully attach the IC clip to the IC and check if it is detected by `flashrom`.
 ```bash
@@ -386,5 +387,5 @@ It should be disabled.
 
 ## Concluding
 
-I hope this article helps anybody who is seeking for information about Intel ME and the steps to disabling it.
+I hope this article helps anybody who is seeking for information about Intel ME and the steps to disabling it. Feel Free to create an issue regarding any queries or doubt about any step of the process.
 I'm thankful to the Nicola Corna for me_cleaner and the basic wiki, and to Gentoo wiki which guided me through the entire process.
