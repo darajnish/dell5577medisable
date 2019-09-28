@@ -1,0 +1,47 @@
+Bad news, you have a `HM175 Chipset LPC/eSPI Controller` so you have ME hardware on board and you can't control or disable it, continuing...
+
+MEI found: [8086:a13a] 100 Series/C230 Series Chipset Family MEI Controller #1
+
+ME Status   : 0x90000245
+ME Status 2 : 0x66000506
+
+ME: FW Partition Table      : OK
+ME: Bringup Loader Failure  : NO
+ME: Firmware Init Complete  : YES
+ME: Manufacturing Mode      : NO
+ME: Boot Options Present    : NO
+ME: Update In Progress      : NO
+ME: Current Working State   : Normal
+ME: Current Operation State : M0 with UMA
+ME: Current Operation Mode  : Normal
+ME: Error Code              : No Error
+ME: Progress Phase          : Host Communication
+ME: Power Management Event  : Pseudo-global reset
+ME: Progress Phase State    : Host communication established
+
+ME: Extend Register not valid
+
+ME: Firmware Version 11.8.3590.65 (code) 11.8.3590.65 (recovery) 11.6.1142.1 (fitc)
+
+ME Capability: Full Network manageability                 : OFF
+ME Capability: Regular Network manageability              : OFF
+ME Capability: Manageability                              : OFF
+ME Capability: Small business technology                  : OFF
+ME Capability: Level III manageability                    : OFF
+ME Capability: IntelR Anti-Theft (AT)                     : OFF
+ME Capability: IntelR Capability Licensing Service (CLS)  : ON
+ME Capability: IntelR Power Sharing Technology (MPC)      : OFF
+ME Capability: ICC Over Clocking                          : OFF
+ME Capability: Protected Audio Video Path (PAVP)          : ON
+ME Capability: IPV6                                       : OFF
+ME Capability: KVM Remote Control (KVM)                   : OFF
+ME Capability: Outbreak Containment Heuristic (OCH)       : OFF
+ME Capability: Virtual LAN (VLAN)                         : ON
+ME Capability: TLS                                        : OFF
+ME Capability: Wireless LAN (WLAN)                        : OFF
+Bad news, you have a `HM175 Chipset LPC/eSPI Controller` so you have ME hardware on board and you can't control or disable it, continuing...
+
+ME Capability: BootGuard                                  : ON
+ME Capability: BootGuard Mode                             : Verified & Measured Boot
+
+Verified boot is enabled. You can't flash other firmware. !

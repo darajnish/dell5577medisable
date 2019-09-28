@@ -1,0 +1,9 @@
+Full image detected
+Found FPT header at 0x1010
+Found 11 partition(s)
+Found FTPR header: FTPR partition spans from 0x1000 to 0xa8000
+Found FTPR manifest at 0x1448
+ME/TXE firmware version 11.8.65.3590 (generation 3)
+Public key match: Intel ME, firmware versions 11.x.x.x
+The HAP bit is NOT SET
+Checking the FTPR RSA signature... VALID
