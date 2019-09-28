@@ -324,11 +324,11 @@ See [output](/logs/me_cleaner-check.log).
 ### Step 6: Modify the Firmware image
 
 - You can disable Intel ME in two ways, you can choose either of these :
-    1. **soft-disable**:  It both removes the uneeded ME firmware and sets the AltMeDisable/HAP bit. **You can do this one only if you don't have Intel Boot Guard enabled.**
+1. **soft-disable**:  It both removes the uneeded ME firmware and sets the AltMeDisable/HAP bit. **You can do this one only if you don't have Intel Boot Guard enabled.**
 ```bash
 $ python me_cleaner/me_cleaner.py --soft-disable original.rom --output modified.rom
 ```
-    1. **soft-disable-only** (recommended): It only sets the AltMeDisable/HAP bit. **You must go for this if you've Intel Boot Guard enabled.**
+2. **soft-disable-only** (recommended): It only sets the AltMeDisable/HAP bit. **You must go for this if you've Intel Boot Guard enabled.**
 ```bash
 $ python me_cleaner/me_cleaner.py --soft-disable-only original.rom --output modified.rom
 ```
