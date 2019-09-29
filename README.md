@@ -67,7 +67,7 @@ So, The entire process can be divided into the following steps:
 
 ### Things Required
 
-- SOIC-8 SOP-8 flash chip test clip, to attach it to the 8 pins of the BIOS flash chip to access its contents
+- SOIC-8 SOP-8 flash clip, to attach it to the 8 pins of the BIOS flash chip to access its contents
 ![SOIC8 clip](imgs/clip.jpg)
 - Raspberry PI 2/3/4 (with it's official power adapter), to use it as a SPI flash programmer
 ![Raspberry Pi 4B](imgs/rpi.jpg)
@@ -148,22 +148,23 @@ Then, to set the systemd service to auto connect your wifi hotspot when booting 
 $ ln -svf /usr/lib/systemd/system/wpa_supplicant@.service root/etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
 $ exit
 ```
-- Now, you can return back to the respective Arch Linux ARM wiki page to continue with the 7th step and skip the part about connecting with ethernet. Instead Turn ON your wifi hotspot before booting Raspberry Pi, and make sure to give internet access through the hotspot. 
+- Now, you can return back to the respective Arch Linux ARM wiki page to continue with the 7th step and skip the part about connecting with ethernet. Instead, Turn ON your wifi hotspot before booting Raspberry Pi, and make sure to give internet access through the hotspot. 
+
 **Note: Use the official Raspberry Pi adapter to power the pi. Using an insufficient power supply will result in random, inexplicable errors and filesystem corruption.**
 
-Looking for the ip address of the Raspberry Pi to connect it using ssh is a tedious job. If you use a wifi router then you can go the router settings page through your browser and login to see the connected clients and find out the ip of 'alarmpi'.
+Looking for the ip address of the Raspberry Pi to connect it using ssh is a tedious job. If you use a wifi router then you can go the router settings page through your browser and login to see the connected clients and find out the ip address of 'alarmpi'.
 
 However, if you have used other methods then you can install `nmap` on your linux distro (kali users already have nmap installed).
-First know your own ip address on the wifi, execute `ip addr`. This will list the interfaces, the interface name starting with 'wlan' or 'wlp' name is wifi interface and the ip address after the word 'inet' is what we're looking for (ex: 192.168.0.142/24).
+First know your own ip address on the wifi, execute `ip addr`. This will list all the network interfaces, the interface name starting with 'wlan' or 'wlp' name is wifi interface and the ip address after the word 'inet' is what we're looking for (ex: 192.168.0.142/24).
 Now we'll use the ip to probe other devices connected to the network. Just by replacing the last byte of the address with 0 (ex: 192.168.0.142/24 to 192.168.0.0/24) and probing using nmap will fetch the list of connected devices. 
 ```bash
 $ nmap -sn 192.168.0.0/24
 ```
-Now, if you've connected just your laptop and Raspberry Pi connected to the wifi then the ip address other than your ip in the output is the ip  of the pi.
-If there are many devices connected on the network, then you can power off the pi and probe using nmap and then power on and again probe using nmap, then simply compare the changes in the output to find out the ip address of the pi.
+Now, if you've connected just your laptop and Raspberry Pi to the wifi then the ip address other than your laptop's ip address in the output is the ip address of the Raspberry Pi.
+If there are many devices connected on the network, then you can power off the Pi and probe using `nmap` and then power on and again probe using nmap, then simply compare the changes in the output to find out the ip address of the Pi.
 
 **If you've got a monitor connected to the Raspberry PI, you're easy to go and you must skip the stuffs about ssh and move to the next step.**
-Now, you can login on pi through ssh (install `openssh` if you don't have ssh client installed) if pi's ip is 192.168.0.184 by executing `ssh alarm@192.168.0.184` using password 'alarm'.
+Now, you can login on pi through ssh (install `openssh` if you don't have ssh client installed) if Pi's ip address is 192.168.0.184, by executing `ssh alarm@192.168.0.184` using password 'alarm'.
 
 - After completing the 10th step on the wiki, update the arch linux and install the required packages, password for root is 'root'.
 ```bash
@@ -173,9 +174,9 @@ $ pacman -S python python-setuptools python-pip flashrom wget git base-devel
 $ pip install RPi.GPIO
 $ exit
 ```
-To check if raspberry shows SPI devices execute `ls /dev/spidev*`, if the out says 'No such file or directory' then SPI is not enabled else everything is setup and ready for our process.
+To check if raspberry shows SPI devices execute `ls /dev/spidev*`, if the out says 'No such file or directory' then SPI is not enabled. Or else, everything is setup and ready for our process.
 
-- Raspberry lacks inbuilt RTC module to keep time even when it's powered off. So, we need to update time in order to make it able to access the internet.
+- Raspberry lacks inbuilt RTC module to keep the current time when it's powered off. So, we need to update time in order to make it able to access the internet.
 To solve the issue, execute on the first boot while connected to internet:
 ```bash
 $ su root
@@ -222,8 +223,9 @@ Make sure to disconnect the batteries and CMOS cell from the while performing th
 | 6   | CLK      | Serial Clock Input                                                          |
 | 7   | IO3      | Data Input Output3                                                          |
 | 8   | Vcc      | Power Supply                                                                |
+
 **Mark the SOIC-8 flash chip test clip for the respective pin numbers of the IC to attach to, so that you don't get confused after wiring the clip with Raspberry Pi for which way to attach the clip.**
-- We'll have to use the SOIC-8 SOP-8 flash chip test clip to connect the bios flash IC to required Raspberry Pi SPI device pins respectively. Connect the pins of the clip to the Raspberry Pi pins using female to female jumper wires accordingly. Identify all the pins on the IC through its datasheet and look the gpio pin diagram for Raspberry Pi and connect the SOIC-8 clip pins as follows, so that it attaches to the correct pins on the IC after the clip is attached to the IC:
+- We'll have to use the SOIC-8 SOP-8 flash clip to connect the bios flash IC to required Raspberry Pi SPI device pins respectively. Connect the pins of the clip to the Raspberry Pi pins using female to female jumper wires accordingly. Identify all the pins on the IC through its datasheet and look the gpio pin diagram for Raspberry Pi and connect the SOIC-8 clip pins as follows, so that it attaches to the correct pins on the IC after the clip is attached to the IC:
 
 ![Pin Diagram](imgs/pindiagram.png)
 
@@ -239,9 +241,10 @@ Make sure to disconnect the batteries and CMOS cell from the while performing th
 | DI                  | 5   | SPI_MOSI              | 19  |
 | /WP (IO2)           | 3   | GPIO_GEN4             | 16  |
 | /HOLD (IO3)         | 7   | GPIO_GEN5             | 18  |
+
 **Note**: Don't attach the clip to the IC right now because it won't work.
 
-- Now, make sure your wifi router/hotspot is turned on, supply power to turn on the Raspberry Pi. It should automatically connect to the wifi while booting. If you've got a monitor attached to the raspberry pi, you're easy to go, you can just login. However, if you don't have a monitor then we can access the Raspberry Pi's shell through ssh. If you've another PC or MAC, you can connect it to the same wifi and use an appropriate ssh client for the operating system to connect to the Raspberry Pi. If you don't have another PC but you've an android smartphone or tablet, you can still access the Raspberry Pi through ssh, connect the phone/tablet to the same wifi network(if your wifi hotspot is from the same phone/tablet, you're already on the same network) just install the Termux app from the the [Play store](https://play.google.com/store/apps/details?id=com.termux) or [F-Droid](https://f-droid.org/repository/browse/?fdid=com.termux) and install openssh and nmap packages on termux; `pkg install openssh nmap`(Refer Step 2 to probe Pi's ip address and connect using ssh).
+- Now, make sure your wifi router/hotspot is turned on, and supply power to turn on the Raspberry Pi. It should automatically connect to the wifi while booting. If you've got a monitor attached to the raspberry pi, you're easy to go, you can just login. However, if you don't have a monitor then we can access the Raspberry Pi's shell through ssh. If you've another PC or MAC, you can connect it to the same wifi and use an appropriate ssh client for the operating system to connect to the Raspberry Pi. If you don't have another PC but you've an android smartphone or tablet, you can still access the Raspberry Pi through ssh. Connect the phone/tablet to the same wifi network(if your wifi hotspot is from the same phone/tablet, you're already on the same network) just install the Termux app from the the [Play store](https://play.google.com/store/apps/details?id=com.termux) or [F-Droid](https://f-droid.org/repository/browse/?fdid=com.termux) and install openssh and nmap packages on termux and connect to the Pi using ssh. Use `pkg install openssh nmap` to install the packages on termux. (Refer Step 2 to probe Pi's ip address and connect using ssh).
 - Once you've got access to the Raspberry Pi's shell, get root login and make sure the internet works.
 ```bash
 $ su --login root
@@ -271,6 +274,7 @@ Found Winbond flash chip "W25Q32.V" (4096 kB, SPI) on linux_spi.
 No operations were specified.
 ```
 ( _See [output](/logs/identification.log)_ )
+
 But, if you get `No EEPROM/flash device found` then recheck the connections and alignment of the clip with the IC; remove and reattach the IC and repeat the above command until it gets detected.
 
 **WARNING: If flashrom reports that it has found a brand or make of chip that doesn't match what you expected, stop. Search online and only proceed if you are confident there is no ambiguity.**
@@ -309,6 +313,7 @@ $ cd ../../..
 $ ./coreboot/util/ifdtool/ifdtool -d original.rom
 ```
 You should get output something like [this](/logs/ifdtoollog-original-rom.log) .
+
 **WARNING: If ifdtool -d reports an error, or states that No Flash Descriptor found in this image, stop. Repeat the read process until you have the identical copies and this ifdtool -d check.**
 
 Check if `me_cleaner` tool understands this image,
