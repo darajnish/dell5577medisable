@@ -94,7 +94,7 @@ So, The entire process can be divided into the following steps:
 **For Linux User**:
 
 - Install `git`,`gcc`,`make` and development files(header files) for pciutils and zlib if not already installed according to your distribution (kali users skip this).
-- Now in the terminal execute these to check for me status:
+- Now in the terminal execute these to check for Intel ME status:
 ```bash
 $ git clone --depth=1 https://review.coreboot.org/coreboot
 $ cd coreboot/util/intelmetool
@@ -122,32 +122,31 @@ If the line `ME Capability: BootGuard: ON` shows 'ON' then Intel Boot Guard is o
 
 I used Raspberry PI 4B for my setup but you may use any Raspberry PI(2|3|4), you just need to install a linux operating system with SPI devices enabled. Here, we're installing [Arch Linux ARM](https://archlinuxarm.org/).
 
-- Follow the steps to install Arch Linux ARM for your Raspberry Pi board till step 6: [Raspberry Pi 2](https://archlinuxarm.org/platforms/armv7/broadcom/raspberry-pi-2) [Raspberry Pi 3](https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-3) [Raspberry Pi 4](https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-4) 
-- Just after 6th step during the process of installation of Arch Linux ARM add the following line to enable SPI devices,
-```bash
-$ echo 'device_tree_param=spi=on' >> boot/config.txt
-```
-- After the above step, To make Raspberry Pi automatically join a wifi hotspot on boot do the following:
-Create a file `/etc/systemd/network/wlan0.network`by the following by starting a root shell:
+- Get a root shell
 ```bash
 $ sudo bash
-$ cat > root/etc/systemd/network/wlan0.network << "EOF"
-[Match]
-Name=wlan0
+```
+And, follow the steps to install Arch Linux ARM for your Raspberry Pi board till step 6: [Raspberry Pi 2](https://archlinuxarm.org/platforms/armv7/broadcom/raspberry-pi-2) [Raspberry Pi 3](https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-3) [Raspberry Pi 4](https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-4) 
+- Just after 6th step during the process of installation of Arch Linux ARM add the following line to enable the SPI interface for devices,
+```bash
+# echo 'device_tree_param=spi=on' >> boot/config.txt
+```
+- After the above step, To make Raspberry Pi automatically join a wifi hotspot on boot do the following:
+Create a file `/etc/wpa_supplicant/wpa_supplicant-wlan0.conf` by the following, replace _SSID_ with your Hotspot's SSID and _PASSWORD_ with your wifi password:
+```bash
+# wpa_passphrase "SSID" "PASSWORD" > root/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+```
+Then, to set the systemd services for auto connecting your Raspberry Pi to the wifi hotspot when booting,
+```bash
+# ln -svf /usr/lib/systemd/system/wpa_supplicant@.service root/etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
+# ln -svf /usr/lib/systemd/system/dhcpcd@.service root/etc/systemd/system/multi-user.target.wants/dhcpcd@wlan0.service
+```
+- Raspberry lacks inbuilt RTC module to keep the current time when it's powered off. So, we need to update time in order to make it able to access the internet.
+To solve the issue, we'll add a few static ip addresses of ntp servers. Here, it's google's ntp servers.
+```bash
+# echo "FallbackNTP=216.239.35.0 216.239.35.4 216.239.35.8 216.239.35.12" >> root/etc/systemd/timesyncd.conf
+```
 
-[Network]
-DHCP=yes
-EOF
-```
-Now, create a file `/etc/wpa_supplicant/wpa_supplicant-wlan0.conf`by the following, replace _SSID_ with your Hotspot's SSID and _PASSWORD_ with your wifi password:
-```bash
-$ wpa_passphrase "SSID" "PASSWORD" > root/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-```
-Then, to set the systemd service to auto connect your wifi hotspot when booting and exit the root shell
-```bash
-$ ln -svf /usr/lib/systemd/system/wpa_supplicant@.service root/etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
-$ exit
-```
 - Now, you can return back to the respective Arch Linux ARM wiki page to continue with the 7th step and skip the part about connecting with ethernet. Instead, Turn ON your wifi hotspot before booting Raspberry Pi, and make sure to give internet access through the hotspot. 
 
 **Note: Use the official Raspberry Pi adapter to power the pi. Using an insufficient power supply will result in random, inexplicable errors and filesystem corruption.**
@@ -169,22 +168,13 @@ Now, you can login on pi through ssh (install `openssh` if you don't have ssh cl
 - After completing the 10th step on the wiki, update the arch linux and install the required packages, password for root is 'root'.
 ```bash
 $ su root
-$ pacman -Syu
-$ pacman -S python python-setuptools python-pip flashrom wget git base-devel
-$ pip install RPi.GPIO
-$ exit
+# pacman -Syu
+# pacman -S python python-setuptools python-pip flashrom wget git base-devel
+# pip install RPi.GPIO
+# exit
 ```
 To check if raspberry shows SPI devices execute `ls /dev/spidev*`, if the out says 'No such file or directory' then SPI is not enabled. Or else, everything is setup and ready for our process.
 
-- Raspberry lacks inbuilt RTC module to keep the current time when it's powered off. So, we need to update time in order to make it able to access the internet.
-To solve the issue, execute on the first boot while connected to internet:
-```bash
-$ su root
-$ echo "FallbackNTP=$(getent hosts 0.arch.pool.ntp.org | head -n1 | awk '{ print $1 }')" >> /etc/systemd/timesyncd.conf
-$ systemctl enable systemd-timesyncd
-$ systemctl start systemd-timesyncd
-$ exit
-```
 - Now, you can execute `exit` and exit ssh shell.
 
 ### Step 3: Disassemble the Laptop
@@ -248,12 +238,12 @@ Make sure to disconnect the batteries and CMOS cell from the while performing th
 - Once you've got access to the Raspberry Pi's shell, get root login and make sure the internet works.
 ```bash
 $ su --login root
-$ ping -c 4 archlinux.org
+# ping -c 4 archlinux.org
 ```
 - Now, We need to pull-up the gpio pins 16 and 18 on the Raspberry Pi. I've created the following script for this purpose. However, you can do this using `wiringpi` package's `gpio` tool for Pi 2 or 3. But, `wiringpi` fails for Pi 4 and its development seems to have stopped. Fortunately, the python library `RPi.GPIO` works on all three.
 ```bash
-$ wget https://raw.githubusercontent.com/darajnish/dell5577medisable/master/scripts/gpio.py
-$ python gpio.py 
+# wget https://raw.githubusercontent.com/darajnish/dell5577medisable/master/scripts/gpio.py
+# python gpio.py 
 ```
 It should output the current value read from the pins 23 and 24 be set to **1**.
 
@@ -262,7 +252,7 @@ It should output the current value read from the pins 23 and 24 be set to **1**.
 
 - Now, taking precautions to prevent [ESD](https://www.computerhope.com/esd.htm) and ensuring proper alignment of the clip with respect to the IC pins, carefully attach the IC clip to the IC and check if it is detected by `flashrom`.
 ```bash
-$ flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000
+# flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000
 ```
 The output should be something like,
 ```
@@ -283,9 +273,9 @@ But, if you get `No EEPROM/flash device found` then recheck the connections and 
 
 - Once the chip gets detected by flashrom, we can proceed to read the firmware. Read the firmware image by the following command (we'll read 3 copies),
 ```bash
-$ flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -r original.rom
-$ flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -r original2.rom
-$ flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -r original3.rom
+# flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -r original.rom
+# flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -r original2.rom
+# flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -r original3.rom
 ```
 Output should be something like,
 ```
@@ -300,17 +290,17 @@ Reading flash... done.
 
 - Now, we must verify if the read data is identical for all the three files. We can do so by checking the integrity of the read files using `md5sum`.
 ```bash
-$ md5sum original*
+# md5sum original*
 ```
 **WARNING: The hashes of the checksum of all the three should be identical. If any one of them is different then read the firmware again and again until the image files are identical. Make sure the IC clip is attached properly. You can reduce(adjust) the `spispeed=` parameter value to what is given in the datasheet.**
 
 - Verify the structure of the firmware image,
 ```bash
-$ git clone --depth=1 https://review.coreboot.org/coreboot
-$ cd coreboot/util/ifdtool
-$ make
-$ cd ../../..
-$ ./coreboot/util/ifdtool/ifdtool -d original.rom
+# git clone --depth=1 https://review.coreboot.org/coreboot
+# cd coreboot/util/ifdtool
+# make
+# cd ../../..
+# ./coreboot/util/ifdtool/ifdtool -d original.rom
 ```
 You should get output something like [this](/logs/ifdtoollog-original-rom.log) .
 
@@ -318,8 +308,8 @@ You should get output something like [this](/logs/ifdtoollog-original-rom.log) .
 
 Check if `me_cleaner` tool understands this image,
 ```bash
-$ git clone https://github.com/corna/me_cleaner
-$ python me_cleaner/me_cleaner.py --check original.rom
+# git clone https://github.com/corna/me_cleaner
+# python me_cleaner/me_cleaner.py --check original.rom
 ```
 See [output](/logs/me_cleaner-check.log).
 
@@ -331,17 +321,17 @@ See [output](/logs/me_cleaner-check.log).
 - You can disable Intel ME in two ways, you can choose either of these :
 1. **soft-disable**:  It both removes the uneeded ME firmware and sets the AltMeDisable/HAP bit. **You can do this one only if you don't have Intel Boot Guard enabled.**
 ```bash
-$ python me_cleaner/me_cleaner.py --soft-disable original.rom --output modified.rom
+# python me_cleaner/me_cleaner.py --soft-disable original.rom --output modified.rom
 ```
 2. **soft-disable-only** (recommended): It only sets the AltMeDisable/HAP bit. **You must go for this if you've Intel Boot Guard enabled.**
 ```bash
-$ python me_cleaner/me_cleaner.py --soft-disable-only original.rom --output modified.rom
+# python me_cleaner/me_cleaner.py --soft-disable-only original.rom --output modified.rom
 ```
 See [output](/logs/me_cleaner-soft-disable-only.log) (for soft-disable-only)
 
 - Now, check the modified image file,
 ```bash
-$ python me_cleaner/me_cleaner.py --check modified.rom
+# python me_cleaner/me_cleaner.py --check modified.rom
 ```
 It shows `The HAP bit is SET` in the [output](/logs/me_cleaner-after-check.log).
 
@@ -349,7 +339,7 @@ It shows `The HAP bit is SET` in the [output](/logs/me_cleaner-after-check.log).
 
 - Write the modified firmware into the BIOS flash IC,
 ```bash
-$ flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -w modified.rom
+# flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -w modified.rom
 ```
 flashrom should show output something like,
 ```
@@ -379,8 +369,8 @@ If it doesn't auto shutdowns and everything works fine then congratulations you'
 - Setup the connections for IC clip and Raspberry Pi.
 - Attach the IC clip on the flash IC properly and write the original firmware image back into the IC.
 ```bash
-$ python gpio.py
-$ flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -w original.rom
+# python gpio.py
+# flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -w original.rom
 ```
 - Now, reassemble the laptop and get it back in previous state.
 - You can report about the problem [here](https://github.com/corna/me_cleaner/issues/new).
@@ -393,4 +383,4 @@ It should be disabled.
 ## Concluding
 
 I hope this article helps anybody who is seeking for information about Intel ME and the steps to disabling it. Feel Free to create an issue regarding any queries or doubt about any step of the process.
-I'm thankful to the Nicola Corna for me_cleaner and the basic wiki, and to Gentoo wiki which guided me through the entire process.
+I'm thankful to the Nicola Corna for me_cleaner and the basic wiki, and to Sakaki for Gentoo wiki which guided me through the entire process.
