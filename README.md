@@ -44,7 +44,7 @@ Before proceeding further, I'd recommend to read these pages which I followed to
 - [Get the status of Intel ME](https://github.com/corna/me_cleaner/wiki/Get-the-status-of-Intel-ME) (To check the current status of ME before changing anything)
 - [How does it work ?](https://github.com/corna/me_cleaner/wiki/How-does-it-work%3F) (Basic knowledge of what's being done)
 - [Nicola Corna's Guide to external flashing](https://github.com/corna/me_cleaner/wiki/External-flashing) (Generic steps through external flashing)
-- [Gentoo Wiki's great detailed guide for external flashing](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Disabling_the_Intel_Management_Engine)* (The best step by step guide for this process which I followed)
+- [Gentoo Wiki's great detailed guide for external flashing](https://wiki.gentoo.org/wiki/User:Sakaki/Sakaki%27s_EFI_Install_Guide/Disabling_the_Intel_Management_Engine)* (The best step by step guide for this process which I followed)
 
 ### Short Description
 
@@ -63,7 +63,7 @@ So, The entire process can be divided into the following steps:
  - Reassemble the laptop
  - Recheck the status of Intel ME
  
-**It is recommended to go through the [Gentoo wiki](https://wiki.gentoo.org/wiki/Sakaki%27s_EFI_Install_Guide/Disabling_the_Intel_Management_Engine)* as it is the more detailed procedure, which guided me along with every precautions and safety to successfully perform this process.**
+**It is recommended to go through the [Gentoo wiki](https://wiki.gentoo.org/wiki/User:Sakaki/Sakaki%27s_EFI_Install_Guide/Disabling_the_Intel_Management_Engine)* as it is the more detailed procedure, which guided me along with every precautions and safety to successfully perform this process.**
 
 ### Things Required
 
@@ -423,6 +423,3 @@ flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=8000 -w original.rom
 ## Concluding
 
 I hope this article helps anybody who is seeking information about Intel ME and the steps to disabling it. Feel Free to create an issue regarding any queries or doubt about any of the steps, and suggestions towards the improvement of this article are appreciated. I'm thankful to the Nicola Corna for me_cleaner and the basic wiki, and to Sakaki for Gentoo wiki* which guided me through the entire process.
-
-
-* **Unfortunately the Gentoo Wiki by Sakaki is no more available :( so the links to the wiki in this guide doesn't work anymore**
